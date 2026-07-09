@@ -132,6 +132,129 @@
       </ul>
     </section>
 
+    <section id="pomodoroPage" class="pomodoro-page">
+      <div class="pomodoro-container">
+        <div class="pomodoro-header">
+          <button id="timerBackBtn" class="back-btn">← Back</button>
+
+          <h2>Pomodoro Timer</h2>
+        </div>
+
+        <!-- Session Buttons -->
+        <div class="session-buttons">
+          <button class="session active">Focus</button>
+
+          <button class="session">Break</button>
+
+          <button class="session">Long Break</button>
+        </div>
+
+        <!-- Timer -->
+        <div class="simple-timer">
+          <h1 id="timerDisplay">25:00</h1>
+        </div>
+
+        <!-- Controls -->
+        <div class="timer-controls">
+          <button id="startBtn">▶ Start</button>
+
+          <button id="pauseBtn">⏸ Pause</button>
+
+          <button id="resetBtn">↻ Reset</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="pomodoro-stats">
+          <div class="stat-card">
+            <h3 id="completedSessions">0</h3>
+            <span>Sessions Done</span>
+          </div>
+
+          <div class="stat-card">
+            <h3 id="focusMinutes">0m</h3>
+            <span>Focus Time</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="goalsPage" class="goals-page">
+      <div class="goals-container">
+        <div class="goals-header">
+          <button id="goalsBackBtn" class="back-btn">← Back</button>
+
+          <h2>My Goals</h2>
+        </div>
+
+        <div class="goal-input-box">
+          <input type="text" id="goalInput" placeholder="Enter your goal..." />
+
+          <button id="addGoalBtn">Add Goal</button>
+        </div>
+
+        <ul id="goalList" class="goal-list"></ul>
+      </div>
+    </section>
+
+    <section id="motivationPage" class="motivation-page">
+      <div class="motivation-header">
+        <button id="motivationBackBtn" class="back-btn">← Back</button>
+
+        <h2>Daily Motivation</h2>
+      </div>
+
+      <div class="motivation-card">
+        <div class="motivation-icon">✨</div>
+
+        <p id="motivationQuote" class="motivation-quote">
+          Success starts with consistency.
+        </p>
+
+        <p id="motivationAuthor" class="motivation-author">— Unknown</p>
+
+        <button id="newQuoteBtn" class="new-quote-btn">Get New Quote</button>
+      </div>
+    </section>
+
+    <section id="plannerPage" class="planner-page">
+      <div class="planner-header">
+        <button id="plannerBackBtn" class="back-btn">← Back</button>
+
+        <h2>Daily Planner</h2>
+      </div>
+
+      <div class="planner-input-box">
+        <div class="time-group">
+          <input
+            type="number"
+            id="plannerHour"
+            min="1"
+            max="12"
+            placeholder="HH"
+          />
+
+          <input
+            type="number"
+            id="plannerMinute"
+            min="0"
+            max="59"
+            placeholder="MM"
+          />
+
+          <select id="plannerPeriod">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
+        </div>
+
+        <input type="text" id="plannerTask" placeholder="Enter your plan..." />
+
+        <button id="addPlanBtn">Add Plan</button>
+      </div>
+
+      <div id="plannerList" class="planner-list"></div>
+    </section>
+
     <script src="./script.js"></script>
   </body>
 </html>
