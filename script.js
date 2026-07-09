@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // responsive
-const menuBtn = document.getElementById("#menuBtn");
+const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.querySelector(".sidebar");
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -233,65 +233,122 @@ backBtn.addEventListener("click", () => {
 });
 
 // Add Task Button
-addTaskBtn.addEventListener("click", addTask);
+addTaskBtn.addEventListener("click", () => {
+  addTask();
+});
 
-// Function
-function addTask() {
-  const taskText = taskInput.value.trim();
+// Enter Key Support
+taskInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    addTask();
+  }
+});
 
-  if (taskText === "") return;
+// Add Task Function
+function addTask(taskText = null, completed = false) {
+
+  const text = taskText || taskInput.value.trim();
+
+  if (text === "") return;
 
   const li = document.createElement("li");
 
   li.classList.add("task-item");
 
   li.innerHTML = `
-        <div class="task-left">
-            <input type="checkbox" class="complete-checkbox">
-            <span class="task-text">${taskText}</span>
-        </div>
+    <div class="task-left">
+      <input
+        type="checkbox"
+        class="complete-checkbox"
+        ${completed ? "checked" : ""}
+      >
 
-        <div class="task-actions">
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
-        </div>
-    `;
+      <span class="task-text ${completed ? "completed" : ""}">
+        ${text}
+      </span>
+    </div>
+
+    <div class="task-actions">
+      <button class="edit-btn">Edit</button>
+      <button class="delete-btn">Delete</button>
+    </div>
+  `;
 
   taskList.appendChild(li);
 
   taskInput.value = "";
 
-  // Complete
   const checkbox = li.querySelector(".complete-checkbox");
   const taskSpan = li.querySelector(".task-text");
-
-  checkbox.addEventListener("change", () => {
-    taskSpan.classList.toggle("completed");
-  });
-
-  // Delete
   const deleteBtn = li.querySelector(".delete-btn");
-
-  deleteBtn.addEventListener("click", () => {
-    li.remove();
-  });
-
-  // Edit
   const editBtn = li.querySelector(".edit-btn");
 
-  editBtn.addEventListener("click", () => {
-    const updatedTask = prompt("Edit Task", taskSpan.textContent);
+  // Complete Task
+  checkbox.addEventListener("change", () => {
+    taskSpan.classList.toggle("completed");
+    saveTasks();
+  });
 
-    if (updatedTask && updatedTask.trim() !== "") {
-      taskSpan.textContent = updatedTask;
+  // Delete Task
+  deleteBtn.addEventListener("click", () => {
+    li.remove();
+    saveTasks();
+  });
+
+  // Edit Task
+  editBtn.addEventListener("click", () => {
+
+    const updatedTask = prompt(
+      "Edit Task",
+      taskSpan.textContent
+    );
+
+    if (
+      updatedTask !== null &&
+      updatedTask.trim() !== ""
+    ) {
+      taskSpan.textContent = updatedTask.trim();
+      saveTasks();
     }
+  });
+
+  saveTasks();
+}
+
+// Save Tasks to Local Storage
+function saveTasks() {
+
+  const tasks = [];
+
+  document.querySelectorAll(".task-item").forEach((task) => {
+
+    tasks.push({
+      text: task.querySelector(".task-text").textContent.trim(),
+      completed: task.querySelector(".complete-checkbox").checked
+    });
+
+  });
+
+  localStorage.setItem(
+    "todoTasks",
+    JSON.stringify(tasks)
+  );
+}
+
+// Load Tasks from Local Storage
+function loadTasks() {
+
+  const savedTasks =
+    JSON.parse(localStorage.getItem("todoTasks")) || [];
+
+  savedTasks.forEach((task) => {
+    addTask(task.text, task.completed);
   });
 }
 
-taskInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    addTask();
-  }
+// Load Tasks on Page Refresh
+window.addEventListener("DOMContentLoaded", () => {
+  loadTasks();
 });
 
 // pomodoro logic
@@ -422,6 +479,9 @@ resetBtn.addEventListener("click", () => {
 // Initial Display
 updateDisplay();
 
+
+// goals logic
+
 const goalsBtn = document.getElementById("goalsBtn");
 const goalsPage = document.getElementById("goalsPage");
 const goalsBackBtn = document.getElementById("goalsBackBtn");
@@ -540,7 +600,12 @@ async function loadMotivationQuote() {
   }
 }
 
+
 // daily planner
+
+// ===============================
+// DAILY PLANNER
+// ===============================
 
 const dailyPlanBtn = document.getElementById("dailyPlanBtn");
 const plannerPage = document.getElementById("plannerPage");
@@ -554,131 +619,168 @@ const plannerTask = document.getElementById("plannerTask");
 const addPlanBtn = document.getElementById("addPlanBtn");
 const plannerList = document.getElementById("plannerList");
 
-
-// Open Planner Page
+// Open Planner
 dailyPlanBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    plannerPage.style.display = "block";
+  e.preventDefault();
+  plannerPage.style.display = "block";
 });
-
 
 // Back Button
 plannerBackBtn.addEventListener("click", () => {
-    plannerPage.style.display = "none";
+  plannerPage.style.display = "none";
 });
 
-
-// Add Plan
+// Add Plan Button
 addPlanBtn.addEventListener("click", addPlan);
 
-function addPlan() {
-
-    const hour = plannerHour.value.trim();
-    const minute = plannerMinute.value.trim();
-    const period = plannerPeriod.value;
-
-    const task = plannerTask.value.trim();
-
-    if (
-        hour === "" ||
-        minute === "" ||
-        task === ""
-    ) {
-        return;
-    }
-
-    const formattedTime =
-        `${hour}:${minute.padStart(2, "0")} ${period}`;
-
-    const plan = document.createElement("div");
-
-    plan.classList.add("plan-card");
-
-    plan.innerHTML = `
-    
-        <div class="plan-left">
-
-            <input
-                type="checkbox"
-                class="plan-check"
-            >
-
-            <span class="plan-time">
-                ${formattedTime}
-            </span>
-
-            <span class="plan-text">
-                ${task}
-            </span>
-
-        </div>
-
-        <div class="plan-actions">
-
-            <button class="edit-plan">
-                Edit
-            </button>
-
-            <button class="delete-plan">
-                Delete
-            </button>
-
-        </div>
-
-    `;
-
-    plannerList.appendChild(plan);
-
-    plannerHour.value = "";
-    plannerMinute.value = "";
-    plannerPeriod.value = "AM";
-    plannerTask.value = "";
-
-    const check = plan.querySelector(".plan-check");
-    const text = plan.querySelector(".plan-text");
-
-    // Complete Plan
-    check.addEventListener("change", () => {
-        text.classList.toggle("completed");
-    });
-
-    // Delete Plan
-    const deleteBtn = plan.querySelector(".delete-plan");
-
-    deleteBtn.addEventListener("click", () => {
-        plan.remove();
-    });
-
-    // Edit Plan
-    const editBtn = plan.querySelector(".edit-plan");
-
-    editBtn.addEventListener("click", () => {
-
-        const updated = prompt(
-            "Edit Plan",
-            text.textContent
-        );
-
-        if (
-            updated !== null &&
-            updated.trim() !== ""
-        ) {
-            text.textContent = updated;
-        }
-
-    });
-
-}
-
-
-// Add with Enter Key
+// Enter Key Support
 plannerTask.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter") {
-        addPlan();
-    }
-
+  if (e.key === "Enter") {
+    addPlan();
+  }
 });
 
+// Add New Plan
+function addPlan() {
+  const hour = plannerHour.value.trim();
+  const minute = plannerMinute.value.trim();
+  const period = plannerPeriod.value;
+  const task = plannerTask.value.trim();
 
+  if (hour === "" || minute === "" || task === "") {
+    return;
+  }
+
+  const formattedTime =
+    `${hour}:${minute.padStart(2, "0")} ${period}`;
+
+  createPlan(formattedTime, task, false);
+
+  plannerHour.value = "";
+  plannerMinute.value = "";
+  plannerPeriod.value = "AM";
+  plannerTask.value = "";
+
+  savePlans();
+}
+
+// Create Plan Card
+function createPlan(time, task, completed = false) {
+
+  const plan = document.createElement("div");
+
+  plan.classList.add("plan-card");
+
+  plan.innerHTML = `
+  
+    <div class="plan-left">
+
+      <input
+        type="checkbox"
+        class="plan-check"
+        ${completed ? "checked" : ""}
+      >
+
+      <span class="plan-time">
+        ${time}
+      </span>
+
+      <span class="plan-text ${completed ? "completed" : ""}">
+        ${task}
+      </span>
+
+    </div>
+
+    <div class="plan-actions">
+
+      <button class="edit-plan">
+        Edit
+      </button>
+
+      <button class="delete-plan">
+        Delete
+      </button>
+
+    </div>
+
+  `;
+
+  plannerList.appendChild(plan);
+
+  const check = plan.querySelector(".plan-check");
+  const text = plan.querySelector(".plan-text");
+
+  // Complete
+  check.addEventListener("change", () => {
+    text.classList.toggle("completed");
+    savePlans();
+  });
+
+  // Delete
+  plan.querySelector(".delete-plan").addEventListener("click", () => {
+    plan.remove();
+    savePlans();
+  });
+
+  // Edit
+  plan.querySelector(".edit-plan").addEventListener("click", () => {
+
+    const updated = prompt(
+      "Edit Plan",
+      text.textContent
+    );
+
+    if (
+      updated !== null &&
+      updated.trim() !== ""
+    ) {
+      text.textContent = updated.trim();
+      savePlans();
+    }
+  });
+}
+
+// Save Plans
+function savePlans() {
+
+  const plans = [];
+
+  document.querySelectorAll(".plan-card").forEach((plan) => {
+
+    plans.push({
+      time: plan.querySelector(".plan-time").textContent.trim(),
+      task: plan.querySelector(".plan-text").textContent.trim(),
+      completed: plan.querySelector(".plan-check").checked
+    });
+
+  });
+
+  localStorage.setItem(
+    "dailyPlans",
+    JSON.stringify(plans)
+  );
+}
+
+// Load Plans
+function loadPlans() {
+
+  const savedPlans =
+    JSON.parse(
+      localStorage.getItem("dailyPlans")
+    ) || [];
+
+  savedPlans.forEach((plan) => {
+
+    createPlan(
+      plan.time,
+      plan.task,
+      plan.completed
+    );
+
+  });
+}
+
+// Load Saved Plans On Refresh
+window.addEventListener("DOMContentLoaded", () => {
+  loadPlans();
+});
