@@ -45,7 +45,7 @@ body[data-theme="morning"] {
 
 body[data-theme="afternoon"] {
   background: linear-gradient(135deg, #6ea8ff 0%, #a3e3ff 100%);
-  color: #0f243b;
+  color: #ffffff;
   --surface-bg: rgba(255, 255, 255, 0.58);
   --surface-border: rgba(15, 36, 59, 0.16);
   --surface-text: #0f243b;

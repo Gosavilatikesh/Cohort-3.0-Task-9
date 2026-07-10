@@ -173,37 +173,28 @@ function getThemeByHour(hour) {
 
 }
 
-function getVideo(theme) {
+function getVideo() {
 
   const mode = body.dataset.themeMode;
 
-  if (mode === "light") {
-
-    return "./assets/Sunrise.mp4";
-
-  }
-
-  if (theme === "night") {
-
+  if (mode === "dark") {
     return "./assets/Night.mp4";
-
   }
 
   return "./assets/Sunrise.mp4";
-
 }
 
 function updateVideo() {
 
-  const theme = body.dataset.theme;
-
   const source = backgroundVideo.querySelector("source");
 
-  source.src = getVideo(theme);
+  source.src = getVideo();
 
   backgroundVideo.load();
 
-  backgroundVideo.play().catch(() => { });
+  backgroundVideo.play().catch((err) => {
+    console.log(err);
+  });
 
 }
 
