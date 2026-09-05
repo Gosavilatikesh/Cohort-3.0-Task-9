@@ -548,6 +548,7 @@ const goalsBackBtn = document.getElementById("goalsBackBtn");
 const goalInput = document.getElementById("goalInput");
 const addGoalBtn = document.getElementById("addGoalBtn");
 const goalList = document.getElementById("goalList");
+const GOALS_STORAGE_KEY = "dashboardGoals";
 
 goalsBtn.addEventListener("click", (e) => {
   e.preventDefault();
@@ -558,8 +559,13 @@ goalsBackBtn.addEventListener("click", () => {
   goalsPage.style.display = "none";
 });
 
-addGoalBtn.addEventListener("click", () => {
-  const goalText = goalInput.value.trim();
+addGoalBtn.addEventListener("click", () => addGoal());
+
+goalInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") addGoal();
+});
+
+function addGoal(goalText = goalInput.value.trim(), completed = false) {
 
   if (!goalText) return;
 
@@ -568,7 +574,7 @@ addGoalBtn.addEventListener("click", () => {
   li.classList.add("goal-item");
 
   const goalSpan = document.createElement("span");
-  goalSpan.className = "goal-text";
+  goalSpan.className = `goal-text ${completed ? "completed" : ""}`;
   goalSpan.textContent = goalText;
 
   const goalActions = document.createElement("div");
@@ -600,10 +606,12 @@ addGoalBtn.addEventListener("click", () => {
 
   completeGoalBtn.addEventListener("click", () => {
     goalSpan.classList.toggle("completed");
+    saveGoals();
   });
 
   deleteGoalBtn.addEventListener("click", () => {
     li.remove();
+    saveGoals();
   });
 
   editGoalBtn.addEventListener("click", () => {
@@ -616,6 +624,7 @@ addGoalBtn.addEventListener("click", () => {
       editGoalBtn.textContent = "Edit";
       editGoalBtn.dataset.editing = "false";
       cancelGoalBtn.hidden = true;
+      saveGoals();
       return;
     }
 
@@ -642,7 +651,27 @@ addGoalBtn.addEventListener("click", () => {
     editGoalBtn.dataset.editing = "false";
     cancelGoalBtn.hidden = true;
   });
-});
+
+  goalInput.value = "";
+  saveGoals();
+}
+
+function saveGoals() {
+  const goals = [...goalList.querySelectorAll(".goal-item")].map((goal) => ({
+    text: goal.querySelector(".goal-text").textContent.trim(),
+    completed: goal.querySelector(".goal-text").classList.contains("completed"),
+  }));
+
+  localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals));
+}
+
+function loadGoals() {
+  const savedGoals = JSON.parse(localStorage.getItem(GOALS_STORAGE_KEY)) || [];
+
+  savedGoals.forEach((goal) => addGoal(goal.text, goal.completed));
+}
+
+loadGoals();
 
 //motivation logic
 

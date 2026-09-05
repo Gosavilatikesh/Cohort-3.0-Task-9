@@ -2119,7 +2119,8 @@ h1 {
 }
 
 .goal-edit-input,
-.plan-edit-input {
+.plan-edit-input,
+.list-edit-input {
   width: min(100%, 460px);
   padding: 8px 10px;
   border: 1px solid #8ec5ff;
