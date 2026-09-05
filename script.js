@@ -8,8 +8,9 @@ const wind = document.querySelector("#wind");
 const icon = document.querySelector("#icon");
 const feelsLike = document.querySelector("#feels-like");
 
-const url =
-  "https://api.openweathermap.org/data/2.5/weather?q=Mumbai&appid=abedbadf4af9b3b8c1817ae66d1c237f&units=metric";
+const weatherApiKey = "abedbadf4af9b3b8c1817ae66d1c237f";
+const defaultWeatherUrl =
+  `https://api.openweathermap.org/data/2.5/weather?q=Mumbai&appid=${weatherApiKey}&units=metric`;
 
 function getWeatherIcon(main) {
   switch (main.toLowerCase()) {
@@ -30,13 +31,28 @@ function getWeatherIcon(main) {
 
 async function getWeather() {
   try {
-    const response = await fetch(url);
+    let weatherUrl = defaultWeatherUrl;
+
+    if (navigator.geolocation) {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: false,
+          timeout: 8000,
+          maximumAge: 300000,
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+      weatherUrl =
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${weatherApiKey}&units=metric`;
+    }
+
+    const response = await fetch(weatherUrl);
     if (!response.ok) throw new Error("Weather request failed");
 
     const data = await response.json();
 
-    if (city)
-      city.innerHTML = `<span class="geo-icon">📍</span> ${data.name}, India `;
+    if (city) city.textContent = `📍 ${data.name}, ${data.sys.country}`;
     if (temperature)
       temperature.textContent = `${Math.round(data.main.temp)}°C`;
     if (condition) condition.textContent = data.weather[0].main;
@@ -255,33 +271,44 @@ function addTask(taskText = null, completed = false) {
 
   li.classList.add("task-item");
 
-  li.innerHTML = `
-    <div class="task-left">
-      <input
-        type="checkbox"
-        class="complete-checkbox"
-        ${completed ? "checked" : ""}
-      >
+  const taskLeft = document.createElement("div");
+  taskLeft.className = "task-left";
 
-      <span class="task-text ${completed ? "completed" : ""}">
-        ${text}
-      </span>
-    </div>
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "complete-checkbox";
+  checkbox.checked = completed;
 
-    <div class="task-actions">
-      <button class="edit-btn">Edit</button>
-      <button class="delete-btn">Delete</button>
-    </div>
-  `;
+  const taskSpan = document.createElement("span");
+  taskSpan.className = `task-text ${completed ? "completed" : ""}`;
+  taskSpan.textContent = text;
+
+  const taskActions = document.createElement("div");
+  taskActions.className = "task-actions";
+
+  const editBtn = document.createElement("button");
+  editBtn.className = "edit-btn";
+  editBtn.type = "button";
+  editBtn.textContent = "Edit";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "cancel-edit-btn";
+  cancelBtn.type = "button";
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.hidden = true;
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.type = "button";
+  deleteBtn.textContent = "Delete";
+
+  taskLeft.append(checkbox, taskSpan);
+  taskActions.append(editBtn, cancelBtn, deleteBtn);
+  li.append(taskLeft, taskActions);
 
   taskList.appendChild(li);
 
   taskInput.value = "";
-
-  const checkbox = li.querySelector(".complete-checkbox");
-  const taskSpan = li.querySelector(".task-text");
-  const deleteBtn = li.querySelector(".delete-btn");
-  const editBtn = li.querySelector(".edit-btn");
 
   // Complete Task
   checkbox.addEventListener("change", () => {
@@ -297,22 +324,54 @@ function addTask(taskText = null, completed = false) {
 
   // Edit Task
   editBtn.addEventListener("click", () => {
+    if (editBtn.dataset.editing === "true") {
+      const updatedTask = taskSpan.querySelector("input").value.trim();
 
-    const updatedTask = prompt(
-      "Edit Task",
-      taskSpan.textContent
-    );
+      if (!updatedTask) return;
 
-    if (
-      updatedTask !== null &&
-      updatedTask.trim() !== ""
-    ) {
-      taskSpan.textContent = updatedTask.trim();
+      taskSpan.textContent = updatedTask;
+      editBtn.textContent = "Edit";
+      editBtn.dataset.editing = "false";
+      cancelBtn.hidden = true;
       saveTasks();
+      return;
     }
+
+    const editInput = document.createElement("input");
+    editInput.className = "task-edit-input";
+    editInput.type = "text";
+    editInput.value = taskSpan.textContent;
+    taskSpan.textContent = "";
+    taskSpan.appendChild(editInput);
+    editBtn.textContent = "Save";
+    editBtn.dataset.editing = "true";
+    cancelBtn.hidden = false;
+    editInput.focus();
+    editInput.select();
+
+    editInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") editBtn.click();
+      if (event.key === "Escape") cancelBtn.click();
+    });
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    const editInput = taskSpan.querySelector("input");
+
+    if (!editInput) return;
+
+    taskSpan.textContent = editInput.defaultValue;
+    editBtn.textContent = "Edit";
+    editBtn.dataset.editing = "false";
+    cancelBtn.hidden = true;
   });
 
   saveTasks();
+  taskList.dispatchEvent(
+    new CustomEvent("noteadded", {
+      detail: { text, completed, element: li },
+    }),
+  );
 }
 
 // Save Tasks to Local Storage
@@ -508,46 +567,80 @@ addGoalBtn.addEventListener("click", () => {
 
   li.classList.add("goal-item");
 
-  li.innerHTML = `
-    <span class="goal-text">${goalText}</span>
+  const goalSpan = document.createElement("span");
+  goalSpan.className = "goal-text";
+  goalSpan.textContent = goalText;
 
-    <div class="goal-actions">
+  const goalActions = document.createElement("div");
+  goalActions.className = "goal-actions";
 
-      <button class="complete-goal">
-        Complete
-      </button>
+  const completeGoalBtn = document.createElement("button");
+  completeGoalBtn.className = "complete-goal";
+  completeGoalBtn.textContent = "Complete";
 
-      <button class="edit-goal">
-        Edit
-      </button>
+  const editGoalBtn = document.createElement("button");
+  editGoalBtn.className = "edit-goal";
+  editGoalBtn.textContent = "Edit";
 
-      <button class="delete-goal">
-        Delete
-      </button>
+  const cancelGoalBtn = document.createElement("button");
+  cancelGoalBtn.className = "cancel-goal";
+  cancelGoalBtn.textContent = "Cancel";
+  cancelGoalBtn.hidden = true;
 
-    </div>
-  `;
+  const deleteGoalBtn = document.createElement("button");
+  deleteGoalBtn.className = "delete-goal";
+  deleteGoalBtn.textContent = "Delete";
+
+  goalActions.append(completeGoalBtn, editGoalBtn, cancelGoalBtn, deleteGoalBtn);
+  li.append(goalSpan, goalActions);
 
   goalList.appendChild(li);
 
   goalInput.value = "";
 
-  const goalSpan = li.querySelector(".goal-text");
-
-  li.querySelector(".complete-goal").addEventListener("click", () => {
+  completeGoalBtn.addEventListener("click", () => {
     goalSpan.classList.toggle("completed");
   });
 
-  li.querySelector(".delete-goal").addEventListener("click", () => {
+  deleteGoalBtn.addEventListener("click", () => {
     li.remove();
   });
 
-  li.querySelector(".edit-goal").addEventListener("click", () => {
-    const updatedGoal = prompt("Edit Goal", goalSpan.textContent);
+  editGoalBtn.addEventListener("click", () => {
+    if (editGoalBtn.dataset.editing === "true") {
+      const updatedGoal = goalSpan.querySelector("input").value.trim();
 
-    if (updatedGoal) {
+      if (!updatedGoal) return;
+
       goalSpan.textContent = updatedGoal;
+      editGoalBtn.textContent = "Edit";
+      editGoalBtn.dataset.editing = "false";
+      cancelGoalBtn.hidden = true;
+      return;
     }
+
+    const goalInputEditor = document.createElement("input");
+    goalInputEditor.className = "goal-edit-input";
+    goalInputEditor.type = "text";
+    goalInputEditor.value = goalSpan.textContent;
+    goalSpan.textContent = "";
+    goalSpan.appendChild(goalInputEditor);
+    editGoalBtn.textContent = "Save";
+    editGoalBtn.dataset.editing = "true";
+    cancelGoalBtn.hidden = false;
+    goalInputEditor.focus();
+    goalInputEditor.select();
+  });
+
+  cancelGoalBtn.addEventListener("click", () => {
+    const goalInputEditor = goalSpan.querySelector("input");
+
+    if (!goalInputEditor) return;
+
+    goalSpan.textContent = goalInputEditor.defaultValue;
+    editGoalBtn.textContent = "Edit";
+    editGoalBtn.dataset.editing = "false";
+    cancelGoalBtn.hidden = true;
   });
 });
 
@@ -562,6 +655,9 @@ const motivationQuote = document.getElementById("motivationQuote");
 const motivationAuthor = document.getElementById("motivationAuthor");
 
 const newQuoteBtn = document.getElementById("newQuoteBtn");
+const manualQuoteInput = document.getElementById("manualQuoteInput");
+const manualAuthorInput = document.getElementById("manualAuthorInput");
+const saveQuoteBtn = document.getElementById("saveQuoteBtn");
 
 motivationBtn.addEventListener("click", (e) => {
   e.preventDefault();
@@ -576,10 +672,39 @@ motivationBackBtn.addEventListener("click", () => {
 });
 
 newQuoteBtn.addEventListener("click", () => {
-  loadMotivationQuote();
+  loadMotivationQuote(true);
 });
 
-async function loadMotivationQuote() {
+saveQuoteBtn.addEventListener("click", () => {
+  const manualText = manualQuoteInput.value.trim();
+
+  if (!manualText) return;
+
+  const savedQuote = {
+    quote: manualText,
+    author: manualAuthorInput.value.trim(),
+  };
+
+  localStorage.setItem("manualQuote", JSON.stringify(savedQuote));
+  motivationQuote.textContent = savedQuote.quote;
+  motivationAuthor.textContent = savedQuote.author
+    ? `— ${savedQuote.author}`
+    : "";
+  manualQuoteInput.value = "";
+  manualAuthorInput.value = "";
+});
+
+async function loadMotivationQuote(forceNew = false) {
+  const savedQuote = JSON.parse(localStorage.getItem("manualQuote"));
+
+  if (!forceNew && savedQuote?.quote) {
+    motivationQuote.textContent = savedQuote.quote;
+    motivationAuthor.textContent = savedQuote.author
+      ? `— ${savedQuote.author}`
+      : "";
+    return;
+  }
+
   try {
     const response = await fetch(
       "https://motivational-spark-api.vercel.app/api/quotes",
@@ -671,44 +796,43 @@ function createPlan(time, task, completed = false) {
 
   plan.classList.add("plan-card");
 
-  plan.innerHTML = `
-  
-    <div class="plan-left">
+  const planLeft = document.createElement("div");
+  planLeft.className = "plan-left";
 
-      <input
-        type="checkbox"
-        class="plan-check"
-        ${completed ? "checked" : ""}
-      >
+  const check = document.createElement("input");
+  check.type = "checkbox";
+  check.className = "plan-check";
+  check.checked = completed;
 
-      <span class="plan-time">
-        ${time}
-      </span>
+  const timeSpan = document.createElement("span");
+  timeSpan.className = "plan-time";
+  timeSpan.textContent = time;
 
-      <span class="plan-text ${completed ? "completed" : ""}">
-        ${task}
-      </span>
+  const text = document.createElement("span");
+  text.className = `plan-text ${completed ? "completed" : ""}`;
+  text.textContent = task;
 
-    </div>
+  const planActions = document.createElement("div");
+  planActions.className = "plan-actions";
 
-    <div class="plan-actions">
+  const editPlanBtn = document.createElement("button");
+  editPlanBtn.className = "edit-plan";
+  editPlanBtn.textContent = "Edit";
 
-      <button class="edit-plan">
-        Edit
-      </button>
+  const cancelPlanBtn = document.createElement("button");
+  cancelPlanBtn.className = "cancel-plan";
+  cancelPlanBtn.textContent = "Cancel";
+  cancelPlanBtn.hidden = true;
 
-      <button class="delete-plan">
-        Delete
-      </button>
+  const deletePlanBtn = document.createElement("button");
+  deletePlanBtn.className = "delete-plan";
+  deletePlanBtn.textContent = "Delete";
 
-    </div>
-
-  `;
+  planLeft.append(check, timeSpan, text);
+  planActions.append(editPlanBtn, cancelPlanBtn, deletePlanBtn);
+  plan.append(planLeft, planActions);
 
   plannerList.appendChild(plan);
-
-  const check = plan.querySelector(".plan-check");
-  const text = plan.querySelector(".plan-text");
 
   // Complete
   check.addEventListener("change", () => {
@@ -717,26 +841,48 @@ function createPlan(time, task, completed = false) {
   });
 
   // Delete
-  plan.querySelector(".delete-plan").addEventListener("click", () => {
+  deletePlanBtn.addEventListener("click", () => {
     plan.remove();
     savePlans();
   });
 
   // Edit
-  plan.querySelector(".edit-plan").addEventListener("click", () => {
+  editPlanBtn.addEventListener("click", () => {
+    if (editPlanBtn.dataset.editing === "true") {
+      const updated = text.querySelector("input").value.trim();
 
-    const updated = prompt(
-      "Edit Plan",
-      text.textContent
-    );
+      if (!updated) return;
 
-    if (
-      updated !== null &&
-      updated.trim() !== ""
-    ) {
-      text.textContent = updated.trim();
+      text.textContent = updated;
+      editPlanBtn.textContent = "Edit";
+      editPlanBtn.dataset.editing = "false";
+      cancelPlanBtn.hidden = true;
       savePlans();
+      return;
     }
+
+    const planInputEditor = document.createElement("input");
+    planInputEditor.className = "plan-edit-input";
+    planInputEditor.type = "text";
+    planInputEditor.value = text.textContent;
+    text.textContent = "";
+    text.appendChild(planInputEditor);
+    editPlanBtn.textContent = "Save";
+    editPlanBtn.dataset.editing = "true";
+    cancelPlanBtn.hidden = false;
+    planInputEditor.focus();
+    planInputEditor.select();
+  });
+
+  cancelPlanBtn.addEventListener("click", () => {
+    const planInputEditor = text.querySelector("input");
+
+    if (!planInputEditor) return;
+
+    text.textContent = planInputEditor.defaultValue;
+    editPlanBtn.textContent = "Edit";
+    editPlanBtn.dataset.editing = "false";
+    cancelPlanBtn.hidden = true;
   });
 }
 

@@ -118,7 +118,11 @@
       <div class="todo-header">
         <button id="backBtn" class="back-btn">← Back</button>
 
-        <h2>My Tasks</h2>
+        <div class="panel-heading">
+          <p class="panel-kicker">Focus board</p>
+          <h2>My Tasks</h2>
+          <p class="panel-description">Capture the next thing worth your attention.</p>
+        </div>
       </div>
 
       <div class="todo-input-box">
@@ -137,7 +141,11 @@
         <div class="pomodoro-header">
           <button id="timerBackBtn" class="back-btn">← Back</button>
 
-          <h2>Pomodoro Timer</h2>
+          <div class="panel-heading">
+            <p class="panel-kicker">Deep work</p>
+            <h2>Pomodoro Timer</h2>
+            <p class="panel-description">Protect one focused block, then take a real break.</p>
+          </div>
         </div>
 
         <!-- Session Buttons -->
@@ -183,7 +191,11 @@
         <div class="goals-header">
           <button id="goalsBackBtn" class="back-btn">← Back</button>
 
-          <h2>My Goals</h2>
+          <div class="panel-heading">
+            <p class="panel-kicker">North star</p>
+            <h2>My Goals</h2>
+            <p class="panel-description">Turn a big intention into visible progress.</p>
+          </div>
         </div>
 
         <div class="goal-input-box">
@@ -200,7 +212,11 @@
       <div class="motivation-header">
         <button id="motivationBackBtn" class="back-btn">← Back</button>
 
-        <h2>Daily Motivation</h2>
+        <div class="panel-heading">
+          <p class="panel-kicker">Perspective</p>
+          <h2>Daily Motivation</h2>
+          <p class="panel-description">A small thought to carry into the next hour.</p>
+        </div>
       </div>
 
       <div class="motivation-card">
@@ -212,7 +228,13 @@
 
         <p id="motivationAuthor" class="motivation-author">— Unknown</p>
 
-        <button id="newQuoteBtn" class="new-quote-btn">Get New Quote</button>
+        <div class="quote-editor" aria-label="Manual quote editor">
+          <input id="manualQuoteInput" type="text" placeholder="Write your own quote..." />
+          <input id="manualAuthorInput" type="text" placeholder="Author (optional)" />
+          <button id="saveQuoteBtn" class="save-quote-btn" type="button">Save Quote</button>
+        </div>
+
+        <button id="newQuoteBtn" class="new-quote-btn" type="button">Get New Quote</button>
       </div>
     </section>
 
@@ -220,7 +242,11 @@
       <div class="planner-header">
         <button id="plannerBackBtn" class="back-btn">← Back</button>
 
-        <h2>Daily Planner</h2>
+        <div class="panel-heading">
+          <p class="panel-kicker">Time map</p>
+          <h2>Daily Planner</h2>
+          <p class="panel-description">Give each important moment a place on the day.</p>
+        </div>
       </div>
 
       <div class="planner-input-box">

@@ -700,7 +700,7 @@ h1 {
 
   padding: 40px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(8, 15, 30, 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 
@@ -750,10 +750,18 @@ h1 {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.18);
 
-  color: white;
+  color: #ffffff;
+  caret-color: #ffffff;
+  font-size: 1rem;
+  outline: none;
   backdrop-filter: blur(12px);
+}
+
+.todo-input-box input:focus {
+  border-color: #8ec5ff;
+  box-shadow: 0 0 0 3px rgba(142, 197, 255, 0.2);
 }
 
 .todo-input-box input::placeholder {
@@ -802,11 +810,24 @@ h1 {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .task-text {
   color: white;
   font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.task-edit-input {
+  width: min(100%, 460px);
+  padding: 8px 10px;
+  border: 1px solid #8ec5ff;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font: inherit;
+  outline: none;
 }
 
 .completed {
@@ -834,8 +855,19 @@ h1 {
   background: #2563eb;
 }
 
+.cancel-edit-btn {
+  background: #64748b;
+}
+
 .delete-btn {
   background: #dc2626;
+}
+
+.task-actions button:hover,
+.todo-input-box button:hover,
+.back-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
 }
 
 .complete-btn {
@@ -995,6 +1027,7 @@ h1 {
 
   background: white;
 
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
@@ -1349,6 +1382,45 @@ h1 {
   font-size: 1.1rem;
 }
 
+.quote-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.55fr) auto;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.quote-editor input {
+  min-width: 0;
+  padding: 11px 13px;
+  border: 1px solid var(--button-border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--surface-text);
+  outline: none;
+}
+
+.quote-editor input::placeholder {
+  color: var(--muted-text);
+}
+
+.quote-editor input:focus {
+  border-color: #8ec5ff;
+  box-shadow: 0 0 0 3px rgba(142, 197, 255, 0.18);
+}
+
+.save-quote-btn {
+  padding: 11px 14px;
+  border: 1px solid var(--button-border);
+  border-radius: 10px;
+  background: var(--button-bg);
+  color: var(--surface-text);
+  cursor: pointer;
+}
+
+.save-quote-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
 .new-quote-btn {
   padding: 14px 28px;
 
@@ -1382,6 +1454,10 @@ h1 {
 
   .motivation-quote {
     font-size: 1.2rem;
+  }
+
+  .quote-editor {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1560,4 +1636,527 @@ h1 {
   color: var(--surface-text);
 
   backdrop-filter: blur(10px);
+}
+
+/* Focus studio panels */
+.todo-page,
+.goals-page,
+.planner-page {
+  --panel-ink: #f7f9ff;
+  --panel-muted: rgba(221, 229, 246, 0.68);
+  --panel-line: rgba(210, 225, 255, 0.16);
+  --panel-fill: rgba(12, 20, 39, 0.78);
+  --panel-soft: rgba(255, 255, 255, 0.08);
+  color: var(--panel-ink);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(34, 211, 238, 0.12), transparent 30%),
+    radial-gradient(circle at 90% 85%, rgba(251, 146, 60, 0.12), transparent 32%),
+    rgba(5, 10, 23, 0.82);
+}
+
+.todo-page > *,
+.planner-page > * {
+  width: min(100%, 1040px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.todo-header,
+.planner-header,
+.goals-header {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.panel-heading {
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 3px solid #22d3ee;
+}
+
+.goals-page .panel-heading {
+  border-left-color: #fb923c;
+}
+
+.planner-page .panel-heading {
+  border-left-color: #a3e635;
+}
+
+.panel-kicker {
+  margin-bottom: 5px;
+  color: #67e8f9;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.goals-page .panel-kicker {
+  color: #fdba74;
+}
+
+.planner-page .panel-kicker {
+  color: #bef264;
+}
+
+.todo-header h2,
+.goals-header h2,
+.planner-header h2 {
+  color: var(--panel-ink);
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.panel-description {
+  margin-top: 9px;
+  color: var(--panel-muted);
+  font-size: 0.95rem;
+}
+
+.back-btn {
+  flex: 0 0 auto;
+  border: 1px solid var(--panel-line);
+  border-radius: 10px;
+  background: var(--panel-soft);
+  color: var(--panel-ink);
+  font-weight: 700;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.back-btn:hover {
+  border-color: rgba(103, 232, 249, 0.65);
+  background: rgba(34, 211, 238, 0.14);
+}
+
+.todo-input-box,
+.goal-input-box,
+.planner-input-box {
+  align-items: stretch;
+  padding: 12px;
+  border: 1px solid var(--panel-line);
+  border-radius: 16px;
+  background: var(--panel-fill);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
+}
+
+.todo-input-box input,
+.goal-input-box input,
+.planner-input-box input,
+.planner-input-box select {
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--panel-ink);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.todo-input-box input:focus,
+.goal-input-box input:focus,
+.planner-input-box input:focus,
+.planner-input-box select:focus {
+  border-color: #67e8f9;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: none;
+}
+
+.todo-input-box button,
+.goal-input-box button,
+.planner-input-box button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #22d3ee;
+  color: #082032;
+  font-weight: 800;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.goal-input-box button {
+  background: #fb923c;
+  color: #321407;
+}
+
+.planner-input-box button {
+  background: #a3e635;
+  color: #162106;
+}
+
+.todo-input-box button:hover,
+.goal-input-box button:hover,
+.planner-input-box button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.task-list,
+.goal-list,
+.planner-list {
+  gap: 11px;
+}
+
+.task-item,
+.goal-item,
+.plan-card {
+  min-height: 68px;
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  background: var(--panel-fill);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.task-item:hover,
+.goal-item:hover,
+.plan-card:hover {
+  border-color: rgba(103, 232, 249, 0.46);
+  background: rgba(19, 33, 60, 0.88);
+  transform: translateX(4px);
+}
+
+.goal-item:hover {
+  border-color: rgba(251, 146, 60, 0.56);
+}
+
+.plan-card:hover {
+  border-color: rgba(163, 230, 53, 0.56);
+}
+
+.task-actions button,
+.goal-actions button,
+.plan-actions button {
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.task-actions button:hover,
+.goal-actions button:hover,
+.plan-actions button:hover {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+}
+
+.goal-text,
+.plan-text {
+  overflow-wrap: anywhere;
+}
+
+.goals-container {
+  max-width: 1040px;
+  padding: 34px;
+  border: 1px solid var(--panel-line);
+  border-radius: 22px;
+  background: rgba(12, 20, 39, 0.68);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.25);
+}
+
+.planner-input-box {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.planner-input-box .time-group {
+  align-items: stretch;
+}
+
+.planner-input-box #plannerTask {
+  min-width: 0;
+}
+
+.planner-input-box .time-group input,
+.planner-input-box .time-group select {
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.planner-input-box .time-group select,
+.planner-input-box .time-group select option {
+  color: #f7f9ff;
+  background-color: #17233d;
+}
+
+.plan-left {
+  min-width: 0;
+}
+
+.plan-time {
+  min-width: 78px;
+  padding: 7px 9px;
+  border: 1px solid rgba(163, 230, 53, 0.35);
+  border-radius: 8px;
+  background: rgba(163, 230, 53, 0.1);
+  color: #bef264;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .todo-page,
+  .planner-page {
+    padding: 24px 16px;
+  }
+
+  .goals-page {
+    padding: 16px;
+  }
+
+  .todo-header,
+  .planner-header,
+  .goals-header {
+    gap: 16px;
+  }
+
+  .panel-heading {
+    padding-left: 12px;
+  }
+
+  .panel-description {
+    line-height: 1.4;
+  }
+
+  .todo-input-box,
+  .goal-input-box,
+  .planner-input-box,
+  .planner-input-box .time-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .todo-input-box input,
+  .goal-input-box input,
+  .planner-input-box input,
+  .planner-input-box select,
+  .todo-input-box button,
+  .goal-input-box button,
+  .planner-input-box button,
+  .planner-input-box .time-group input,
+  .planner-input-box .time-group select {
+    width: 100%;
+  }
+
+  .task-item,
+  .goal-item,
+  .plan-card {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .task-actions,
+  .goal-actions,
+  .plan-actions {
+    width: 100%;
+  }
+
+  .task-actions button,
+  .goal-actions button,
+  .plan-actions button {
+    flex: 1;
+  }
+
+  .goals-container {
+    padding: 24px 16px;
+  }
+}
+
+/* Shared styling for every workspace view */
+.pomodoro-page,
+.motivation-page {
+  --panel-ink: #f7f9ff;
+  --panel-muted: rgba(221, 229, 246, 0.68);
+  --panel-line: rgba(210, 225, 255, 0.16);
+  --panel-fill: rgba(12, 20, 39, 0.78);
+  color: var(--panel-ink);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(129, 140, 248, 0.13), transparent 30%),
+    radial-gradient(circle at 90% 85%, rgba(244, 114, 182, 0.1), transparent 32%),
+    rgba(5, 10, 23, 0.82);
+}
+
+.pomodoro-container,
+.motivation-card {
+  border: 1px solid var(--panel-line);
+  border-radius: 22px;
+  background: var(--panel-fill);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+}
+
+.pomodoro-header,
+.motivation-header {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 24px;
+}
+
+.pomodoro-page {
+  scrollbar-width: none;
+}
+
+.pomodoro-page::-webkit-scrollbar {
+  display: none;
+}
+
+.pomodoro-page .panel-heading,
+.motivation-page .panel-heading {
+  border-left-color: #a78bfa;
+}
+
+.pomodoro-page .panel-kicker,
+.motivation-page .panel-kicker {
+  color: #c4b5fd;
+}
+
+.pomodoro-page .panel-heading h2,
+.motivation-page .panel-heading h2 {
+  color: var(--panel-ink);
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pomodoro-page .panel-description,
+.motivation-page .panel-description {
+  margin-top: 9px;
+  color: var(--panel-muted);
+  font-size: 0.95rem;
+}
+
+.pomodoro-page .session-buttons {
+  justify-content: flex-start;
+  padding: 7px;
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.pomodoro-page .session {
+  border-radius: 9px;
+  color: var(--panel-muted);
+}
+
+.pomodoro-page .session.active {
+  background: #a78bfa;
+  color: #1e153b;
+  box-shadow: none;
+}
+
+.pomodoro-page .simple-timer {
+  min-height: 250px;
+  margin: 30px 0;
+  border: 1px solid var(--panel-line);
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.pomodoro-page #timerDisplay {
+  color: #f5f3ff;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  text-shadow: 0 0 28px rgba(167, 139, 250, 0.4);
+}
+
+.pomodoro-page .timer-controls button {
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.pomodoro-page .stat-card {
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  background: rgba(167, 139, 250, 0.1);
+}
+
+.motivation-page .motivation-card {
+  padding: clamp(26px, 5vw, 52px);
+}
+
+.motivation-page .motivation-icon {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 24px;
+  place-items: center;
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  border-radius: 18px;
+  background: rgba(244, 114, 182, 0.1);
+  font-size: 2.5rem;
+}
+
+.motivation-page .motivation-quote {
+  max-width: 650px;
+  margin-right: auto;
+  margin-left: auto;
+  color: #fdf2f8;
+}
+
+.motivation-page .quote-editor {
+  padding: 12px;
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.motivation-page .quote-editor input {
+  color: #ffffff;
+  caret-color: #ffffff;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.motivation-page .quote-editor input::placeholder {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.motivation-page .new-quote-btn {
+  border-radius: 9px;
+  background: #f472b6;
+  color: #3b1028;
+}
+
+.goal-edit-input,
+.plan-edit-input {
+  width: min(100%, 460px);
+  padding: 8px 10px;
+  border: 1px solid #8ec5ff;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font: inherit;
+  outline: none;
+}
+
+.cancel-goal,
+.cancel-plan {
+  background: #64748b;
+  color: white;
+}
+
+@media (max-width: 700px) {
+  .pomodoro-page,
+  .motivation-page {
+    padding: 18px 16px;
+  }
+
+  .pomodoro-header,
+  .motivation-header {
+    gap: 16px;
+  }
+
+  .pomodoro-page .panel-heading,
+  .motivation-page .panel-heading {
+    padding-left: 12px;
+  }
+
+  .pomodoro-page .session-buttons {
+    flex-direction: column;
+  }
+
+  .pomodoro-page .simple-timer {
+    min-height: 190px;
+  }
 }
